@@ -34,6 +34,7 @@
           <option value="fun">喜</option>
           <option value="angry">怒</option>
           <option value="sad">悲</option>
+          <option value="flattering">照</option>
         </select>
       </div>
     </div>

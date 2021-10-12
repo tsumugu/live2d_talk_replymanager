@@ -87,6 +87,8 @@ export default {
         return "(😄喜)"
       } else if (name=="sad") {
         return "(🥲悲)"
+      } else if (name=="flattering") {
+        return "(😀照)"
       } else {
         return "(😑無)"
       }
