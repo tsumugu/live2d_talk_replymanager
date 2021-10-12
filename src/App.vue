@@ -12,10 +12,13 @@
         </div>  
       </div>
     </div>
+    <div class="loading-modal-wrapper" v-show="isShowLoading">
+      <div class="loading-modal">辞書のロード中</div>
+    </div>
     <div class="talk-items">
       <div class="talk-item">
         <!--<AddItem :propsItem="propsItem" />-->
-        <AddItem :propsItemList="itemList" @onClickHelpEvent="show" @onSubmitEvent="loadItemList" />
+        <AddItem :propsItemList="itemList" @onClickHelpEvent="show" @onSubmitEvent="loadItemList" @onKuromojiLoadEndEvent="closeLoading" />
       </div>
       <hr>
       <div class="talk-item" :id="item.id" v-for="item in itemList" :key="item.id">
@@ -62,6 +65,7 @@ export default {
   data: function () {
     return {
       isShowModal: false,
+      isShowLoading: true,
       itemList: [],
       propsItem: null
     }
@@ -72,6 +76,9 @@ export default {
     },
     hide: function () {
       this.isShowModal = false
+    },
+    closeLoading: function() {
+      this.isShowLoading = false
     },
     textToTwemoji: function (name) {
       if (name=="angry") {
@@ -196,6 +203,23 @@ button{
 }
 .modal-body > p {
   margin: 0;
+}
+
+.loading-modal-wrapper {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.loading-modal {
+  font-size: 1.5rem;
+  color: white;
 }
 /*
 .fab {

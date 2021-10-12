@@ -157,6 +157,7 @@ export default {
         console.log(err)
       }
       this.kuromojiTokenizer = tokenizer
+      this.$emit('onKuromojiLoadEndEvent', null)
     })
   }
 }
