@@ -113,10 +113,19 @@ export default {
       } else if (!this.replyText || !this.replyText.match(/\S/g)) {
         alert("返答を設定してください")
         return false
+      } else if (this.kuromojiTokenizer==undefined||this.kuromojiTokenizer==null) {
+        alert("辞書のロードが終わるまでもう少しだけ待ってください")
+        return false
       }
-      const objUttrList = uttrList.map(e=>Object.assign({}, e));
+      // uttrListの読み版をつくる
+      const uttrListReading = uttrList.map(l=>l.map(m=>this.kuromojiTokenizer.tokenize(m)[0].reading).filter(Boolean))
+      //const uniqueUttrListReading = Array.from(new Set(uttrListReading))
+      //console.log(uttrListReading, uniqueUttrListReading)
+      // 読みと文字を合体
+      const uttrListMerged = uttrList.concat(uttrListReading)
+      const objUttrListMerged = uttrListMerged.map(e=>Object.assign({}, e))
       let docObj = {
-        "utterance": objUttrList,
+        "utterance": objUttrListMerged,
         "reply": this.replyText.trim(),
         "emotion_name": this.motion
       }
@@ -144,7 +153,7 @@ export default {
     // kuromoji.builderは毎回辞書をロードするっぽいので、一回だけ呼び出さないとボトルネックになってしまう。
     kuromoji.builder({ dicPath: "/dict" }).build((err, tokenizer) => {
       if(err){
-        alert("読み込みに失敗しました")
+        alert("辞書のロードに失敗しました")
         console.log(err)
       }
       this.kuromojiTokenizer = tokenizer
