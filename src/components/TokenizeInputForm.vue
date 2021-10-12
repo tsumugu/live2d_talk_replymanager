@@ -39,20 +39,20 @@ export default {
     uttr() {
       if (this.kuromojiTokenizer!=undefined&&this.kuromojiTokenizer!=null) {
         const tokens = this.kuromojiTokenizer.tokenize(this.uttr)
-        console.log(tokens)
+        //console.log(tokens)
         this.tokensList = tokens.map(e=>{
-          // 読みを返す
+          /*
+          // 読みを返すパターン
           if (e.reading==undefined) {
             return e.surface_form
           }
           return e.reading
-          /*
+          */
           if (e.basic_form != "*") {
             return e.basic_form
           } else {
             return e.surface_form
           }
-          */
         })
         // this.selectedWordのうち、this.tokensListと一致してるものだけ残す。
         this.selectedWord = this.selectedWord.map(e=>{
