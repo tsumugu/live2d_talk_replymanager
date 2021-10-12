@@ -5,7 +5,7 @@
         <h2 class="left">呼びかけ <p class="help-button" v-on:click="show">?</p></h2>
         <!--<div>-->
         <div class="tokenize-input-form">
-          <TokenizeInputForm @onChangeSelectedWordsListEvent="onChangeSelectedWordsList" :propsItemList="propsItemList" />
+          <TokenizeInputForm @onChangeSelectedWordsListEvent="onChangeSelectedWordsList" :propsItemList="propsItemList" :kuromojiTokenizer="kuromojiTokenizer" />
         </div>
         <button @click="appendTokenizeInputForm">別の言い方を追加</button>
           <!--
@@ -50,6 +50,7 @@ import Vue from 'vue'
 import firestore from '@/firebase/firestore'
 import { collection, addDoc } from 'firebase/firestore/lite'
 import TokenizeInputForm from './TokenizeInputForm.vue'
+import kuromoji from "kuromoji"
 export default {
   name: 'AddItem',
   components: {
@@ -65,7 +66,8 @@ export default {
       isSetedProps: false,
       uttrSelectedWordList: {},
       replyText: "",
-      motion: ""
+      motion: "",
+      kuromojiTokenizer: null
     }
   },
   /*
@@ -92,7 +94,8 @@ export default {
       var ComponentClass = Vue.extend(TokenizeInputForm)
       var instance = new ComponentClass({
         propsData: {
-          propsItemList: this.propsItemList
+          propsItemList: this.propsItemList,
+          kuromojiTokenizer: this.kuromojiTokenizer
         }
       })
       instance.$mount()
@@ -136,6 +139,16 @@ export default {
         console.error(error)
       })
     }
+  },
+  mounted: function() {
+    // kuromoji.builderは毎回辞書をロードするっぽいので、一回だけ呼び出さないとボトルネックになってしまう。
+    kuromoji.builder({ dicPath: "/dict" }).build((err, tokenizer) => {
+      if(err){
+        alert("読み込みに失敗しました")
+        console.log(err)
+      }
+      this.kuromojiTokenizer = tokenizer
+    })
   }
 }
 </script>
