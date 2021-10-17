@@ -5,10 +5,14 @@
       <div class="modal">
         <div class="modal-body">
           <div style="text-align:right;"><button v-on:click="hide" style="border:none;font-size:3rem">×</button></div>
-          <h2>これは何？</h2>
-          <p>ゆらぎ対策。</p><p>呼びかけ方は複数考えられるが、それらのうち共通する部分だけに反応するようにすることでゆらぎに対応できる。例えば、元気か尋ねる文はこのように複数の言い回しが考えられるが、どれも「元気」というワードが共通している。そのため、この場合は「元気」を選択すれば良い。</p>
-          <p style="text-align:center;"><img src="desc.png" style="width: 60%;"></p>
-          <p></p>
+          <div v-if="editTargetItem==null">
+            <h2>これは何？</h2>
+            <p>ゆらぎ対策。</p><p>呼びかけ方は複数考えられるが、それらのうち共通する部分だけに反応するようにすることでゆらぎに対応できる。例えば、元気か尋ねる文はこのように複数の言い回しが考えられるが、どれも「元気」というワードが共通している。そのため、この場合は「元気」を選択すれば良い。</p>
+            <p style="text-align:center;"><img src="desc.png" style="width: 60%;"></p>
+          </div>
+          <div v-else>
+            <EditItem :item="editTargetItem" @onSubmitEvent="onSubmitEditEvent" />
+          </div>
         </div>  
       </div>
     </div>
@@ -35,7 +39,7 @@
           </div>
         </div>
         <div class="balloon-wrapper reply-balloon-wrapper">
-          <p class="balloon reply-balloon">{{textToTwemoji(item.emotion_name)}} {{item.reply}}</p>
+          <p class="balloon reply-balloon">{{textToTwemoji(item.emotion_name)}} {{item.reply}} <span class="material-icons" v-on:click="onClickEditEvent(item.id)">edit</span></p>
         </div>
         <button class="delete-button" v-on:click="onClickDeleteEvent(item.id)">この会話を削除する</button>
         <!--<button v-on:click="onClickEditEvent(item.id)">編集する</button>-->
@@ -48,6 +52,7 @@
 import firestore from '@/firebase/firestore'
 import { collection, doc, getDocs, deleteDoc } from 'firebase/firestore/lite'
 import AddItem from './components/AddItem.vue'
+import EditItem from './components/EditItem.vue'
 
 const confirmPromise = (mes)=>{
   return new Promise(resolve=>{
@@ -60,14 +65,16 @@ const confirmPromise = (mes)=>{
 export default {
   name: 'App',
   components: {
-    AddItem
+    AddItem,
+    EditItem
   },
   data: function () {
     return {
       isShowModal: false,
       isShowLoading: true,
       itemList: [],
-      propsItem: null
+      propsItem: null,
+      editTargetItem: null
     }
   },
   methods: {
@@ -76,9 +83,14 @@ export default {
     },
     hide: function () {
       this.isShowModal = false
+      this.editTargetItem = null
     },
     closeLoading: function() {
       this.isShowLoading = false
+    },
+    onSubmitEditEvent: function() {
+      this.hide();
+      this.loadItemList();
     },
     textToTwemoji: function (name) {
       if (name=="angry") {
@@ -126,6 +138,17 @@ export default {
         })
       })
     },
+    onClickEditEvent: function (id) {
+      const item = this.itemList.filter(e=>e.id==id)
+      if (item.length>0) {
+        // item[0]
+        // open modal
+        this.editTargetItem = item[0]
+        this.show()
+      } else {
+        alert("エラー")
+      }
+    }
     /*
     onClickEditEvent: function (id) {
       const item = this.itemList.filter(e=>e.id==id)
